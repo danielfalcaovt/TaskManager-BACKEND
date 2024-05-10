@@ -1,17 +1,20 @@
 /* eslint-disable @typescript-eslint/return-await */
 import { Login } from './login'
-import { type EmailValidator, ServerError, InvalidParamError, MissingParamError } from './login-protocols'
+import { type EmailValidator, ServerError, InvalidParamError, type Encrypter, MissingParamError } from './login-protocols'
 
 interface sutTypes {
   sut: Login
   emailValidatorStub: EmailValidator
+  encrypterStub: Encrypter
 }
 
 const makeSut = (): sutTypes => {
   const emailValidatorStub = makeEmailValidator()
-  const sut = new Login(emailValidatorStub)
+  const encrypterStub = makeEncrypter()
+  const sut = new Login(emailValidatorStub, encrypterStub)
   return {
     emailValidatorStub,
+    encrypterStub,
     sut
   }
 }
@@ -24,6 +27,24 @@ const makeEmailValidator = (): EmailValidator => {
   }
   const emailValidatorStub = new EmailValidatorStub()
   return emailValidatorStub
+}
+
+const makeEncrypter = (): Encrypter => {
+  class EncrypterStub implements Encrypter {
+    async encrypt (value: string): Promise<string> {
+      return new Promise(resolve => {
+        resolve('hashedValue')
+      })
+    }
+
+    async compare (value: string, hash: string): Promise<boolean> {
+      return new Promise(resolve => {
+        resolve(true)
+      })
+    }
+  }
+  const encrypterStub = new EncrypterStub()
+  return encrypterStub
 }
 
 describe('Login', () => {

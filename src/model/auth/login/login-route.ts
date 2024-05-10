@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/strict-boolean-expressions */
 import type { Request, Response } from 'express'
 import { Login } from './login'
-import { EmailValidator } from './login-protocols'
+import { EmailValidator, Encrypter } from './login-protocols'
 
 export async function loginRoute (req: Request, res: Response): Promise<any> {
   try {
@@ -11,7 +11,8 @@ export async function loginRoute (req: Request, res: Response): Promise<any> {
       body
     }
     const emailValidator = new EmailValidator()
-    const loginQuery = new Login(emailValidator)
+    const encrypter = new Encrypter()
+    const loginQuery = new Login(emailValidator, encrypter)
     const httpResponse = await loginQuery.authenticate(httpRequest)
     return res.status(httpResponse.statusCode).json(httpResponse.body)
   } catch (error) {

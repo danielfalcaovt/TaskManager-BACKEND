@@ -6,7 +6,7 @@ import { authError, badRequest, ok, serverError } from '../../helper/http-helper
 import type { httpRequest, httpResponse } from '../../protocols/http'
 import {
   type EmailValidator,
-  Encrypter,
+  type Encrypter,
   InvalidParamError,
   MissingParamError,
   query
@@ -19,9 +19,11 @@ interface login {
 
 export class Login implements login {
   private readonly emailValidator: EmailValidator
+  private readonly encrypter: Encrypter
 
-  constructor (emailValidator: EmailValidator) {
+  constructor (emailValidator: EmailValidator, encrypter: Encrypter) {
     this.emailValidator = emailValidator
+    this.encrypter = encrypter
   }
 
   async authenticate (httpRequest: httpRequest): Promise<httpResponse> {
@@ -49,8 +51,7 @@ export class Login implements login {
       )
       if (checkIfUserExist.rows.length > 0) {
         const { password: hashedPassword } = checkIfUserExist.rows[0]
-        const encrypter = new Encrypter()
-        const passwordMatch = await encrypter.compare(password, hashedPassword)
+        const passwordMatch = await this.encrypter.compare(password, hashedPassword)
         if (passwordMatch) {
           const { password, ...user } = checkIfUserExist.rows[0]
           const token = jwt.sign({ id: user.id }, process.env.JWT_TOKEN, {
