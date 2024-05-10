@@ -1,0 +1,6 @@
+node_modules
+dist
+coverage
+.husky
+jest.config.ts
+*.config.js
