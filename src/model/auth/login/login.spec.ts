@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/return-await */
 import { Login } from './login'
-import { type EmailValidator, InvalidParamError, MissingParamError } from './login-protocols'
+import { type EmailValidator, ServerError, InvalidParamError, MissingParamError } from './login-protocols'
 
 interface sutTypes {
   sut: Login
@@ -8,7 +9,7 @@ interface sutTypes {
 
 const makeSut = (): sutTypes => {
   const emailValidatorStub = makeEmailValidator()
-  const sut = new Login()
+  const sut = new Login(emailValidatorStub)
   return {
     emailValidatorStub,
     sut
@@ -60,5 +61,20 @@ describe('Login', () => {
     const httpResponse = await sut.authenticate(httpRequest)
     expect(httpResponse.statusCode).toBe(400)
     expect(httpResponse.body).toEqual(new InvalidParamError('email').message)
+  })
+  test('Should throws if emailValidator throw', async () => {
+    const { sut, emailValidatorStub } = makeSut()
+    jest.spyOn(emailValidatorStub, 'isValid').mockImplementationOnce(() => {
+      throw new Error()
+    })
+    const httpRequest = {
+      body: {
+        email: 'any_email',
+        password: 'any_password'
+      }
+    }
+    const httpResponse = await sut.authenticate(httpRequest)
+    expect(httpResponse.statusCode).toBe(500)
+    expect(httpResponse.body).toEqual(new ServerError())
   })
 })
