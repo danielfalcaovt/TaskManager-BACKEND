@@ -10,6 +10,7 @@ import jwt from 'jsonwebtoken'
 interface login {
   authenticate: (httpRequest: httpRequest) => Promise<httpResponse>
 }
+
 export class Login implements login {
   async authenticate (httpRequest: httpRequest): Promise<httpResponse> {
     const requiredParameters = ['email', 'password']
