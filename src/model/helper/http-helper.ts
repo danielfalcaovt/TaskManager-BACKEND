@@ -1,3 +1,4 @@
+import { ServerError } from '../errors/server-error'
 import type { httpResponse } from '../protocols/http'
 
 export const badRequest = (error: Error): httpResponse => {
@@ -18,5 +19,12 @@ export const authError = (): httpResponse => {
   return {
     statusCode: 300,
     body: 'Falha na autênticação.'
+  }
+}
+
+export const serverError = (): httpResponse => {
+  return {
+    statusCode: 500,
+    body: new ServerError()
   }
 }
