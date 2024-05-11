@@ -1,59 +1,86 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/return-await */
 /* eslint-disable @typescript-eslint/strict-boolean-expressions */
-import type { Request, Response } from 'express'
-import { Encrypter, EmailValidator, query, InternalServerErrorTxt, InvalidParamErrorTxt, MissingParamErrorTxt } from './register-protocols'
+import { Week } from '../../data/week/week'
+import { badRequest, ok, serverError } from '../../helper/http-helper'
+import type { httpRequest, httpResponse } from '../../protocols/http'
+import { type EmailValidator, type Encrypter, InvalidParamError, MissingParamError, query } from './register-protocols'
 
-export async function register (req: Request, res: Response): Promise<any> {
-  try {
-    const { body } = req
+interface Register {
+  registerUser: (httpRequest: httpRequest) => Promise<httpResponse>
+}
 
-    const requiredParameters = [
-      'username',
-      'email',
-      'password',
-      'confirmPassword'
-    ]
-    for (const pos of requiredParameters) {
-      if (!body[pos]) {
-        return res.status(400).json({ error: MissingParamErrorTxt(pos) })
+export class register implements Register {
+  private readonly emailValidator: EmailValidator
+  private readonly encrypter: Encrypter
+
+  constructor (emailValidator: EmailValidator, encrypter: Encrypter) {
+    this.emailValidator = emailValidator
+    this.encrypter = encrypter
+  }
+
+  async registerUser (httpRequest: httpRequest): Promise<httpResponse> {
+    try {
+      const requiredParameters = [
+        'username',
+        'email',
+        'password',
+        'confirmPassword'
+      ]
+      for (const pos of requiredParameters) {
+        if (!httpRequest.body[pos]) {
+          return new Promise(resolve => {
+            resolve(badRequest(new MissingParamError(pos)))
+          })
+        }
       }
-    }
 
-    const { username, email, password, confirmPassword } = req.body
+      const { username, email, password, confirmPassword } = httpRequest.body
 
-    const emailValidator = new EmailValidator()
-    if (!emailValidator.isValid(email)) {
-      return res.status(400).json({ error: InvalidParamErrorTxt('email') })
-    }
+      if (!this.emailValidator.isValid(email)) {
+        return new Promise(resolve => {
+          resolve(badRequest(new InvalidParamError('email')))
+        })
+      }
 
-    if (password !== confirmPassword) {
-      return res
-        .status(400)
-        .json({ error: 'As senhas devem ser exatamente iguais.' })
-    }
+      if (password !== confirmPassword) {
+        return new Promise(resolve => {
+          resolve(badRequest(new InvalidParamError('confirmPassword')))
+        })
+      }
 
-    const encrypter = new Encrypter()
-    const hashedPassword = await encrypter.encrypt(password)
+      const hashedPassword = await this.encrypter.encrypt(password)
 
-    const checkIfUserExist = await query(
-      'SELECT * FROM users WHERE username = $1 OR email = $2',
-      [username, email]
-    )
-    if (checkIfUserExist.rows.length > 0) {
-      return res.status(400).json({ error: 'Usuário já existente.' })
-    } else {
-      const insertUserAndReturnIfSuccess = await query(
-        'INSERT INTO users(username, email, password) VALUES($1,$2,$3) RETURNING *',
-        [username, email, hashedPassword]
+      const checkIfUserExist = await query(
+        'SELECT * FROM users WHERE username = $1 OR email = $2',
+        [username, email]
       )
-      if (insertUserAndReturnIfSuccess.rows.length > 0) {
-        const user = insertUserAndReturnIfSuccess.rows[0]
-        res.status(200).json({ user })
+      if (checkIfUserExist.rows.length > 0) {
+        return new Promise(resolve => {
+          resolve(badRequest(new Error('Usuário já existente.')))
+        })
       } else {
-        throw new Error()
+        const insertUserAndReturnIfSuccess = await query(
+          'INSERT INTO users(username, email, password) VALUES($1,$2,$3) RETURNING *',
+          [username, email, hashedPassword]
+        )
+        if (insertUserAndReturnIfSuccess.rows.length > 0) {
+          const user = insertUserAndReturnIfSuccess.rows[0]
+          const createUserWeek = new Week()
+          const weekCreation = await createUserWeek.post(user.id) // CREATE USER WEEK TABLE
+          if (weekCreation.statusCode === 200) {
+            return new Promise(resolve => {
+              resolve(ok(user))
+            })
+          } else {
+            throw new Error()
+          }
+        } else {
+          throw new Error()
+        }
       }
+    } catch (error) {
+      return serverError()
     }
-  } catch (error) {
-    return res.status(500).json({ error: InternalServerErrorTxt() })
   }
 }
