@@ -70,7 +70,7 @@ export class Login implements login {
           resolve(badRequest(new NotFound('user')))
         })
       }
-    } catch (err) {
+    } catch (error) {
       return serverError()
     }
   }

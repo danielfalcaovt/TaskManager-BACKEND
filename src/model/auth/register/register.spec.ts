@@ -1,7 +1,7 @@
 /* eslint-disable new-cap */
 /* eslint-disable @typescript-eslint/return-await */
 import { register } from './register'
-import { InvalidParamError, MissingParamError, type EmailValidator, type Encrypter } from './register-protocols'
+import { InvalidParamError, MissingParamError, ServerError, type EmailValidator, type Encrypter } from './register-protocols'
 
 interface sutTypes {
   sut: register
@@ -128,5 +128,22 @@ describe('register', () => {
     const httpResponse = await sut.registerUser(httpRequest)
     expect(httpResponse.statusCode).toBe(400)
     expect(httpResponse.body).toEqual(new InvalidParamError('confirmPassword').message)
+  })
+  test('Should return 500 if Encrypter throw', async () => {
+    const { sut, encrypterStub } = makeSut()
+    jest.spyOn(encrypterStub, 'encrypt').mockImplementationOnce(() => {
+      throw new Error()
+    })
+    const httpRequest = {
+      body: {
+        username: 'any_username',
+        email: 'any_mail',
+        password: 'any_password',
+        confirmPassword: 'any_password'
+      }
+    }
+    const httpResponse = await sut.registerUser(httpRequest)
+    expect(httpResponse.body).toEqual(new ServerError())
+    expect(httpResponse.statusCode).toBe(500)
   })
 })
