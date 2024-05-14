@@ -1,3 +1,4 @@
+/* eslint-disable no-unreachable-loop */
 /* eslint-disable @typescript-eslint/no-confusing-void-expression */
 /* eslint-disable @typescript-eslint/strict-boolean-expressions */
 /* eslint-disable @typescript-eslint/return-await */
@@ -10,8 +11,8 @@ import { MissingParamError, ServerError, query } from '../notes/note-protocols'
 interface week {
   get: (httpRequest: httpRequest) => Promise<httpResponse>
   post: (id: string) => Promise<httpResponse>
-/*   update: (httpRequest: httpRequest) => Promise<httpResponse>
-  delete: (httpRequest: httpRequest) => Promise<httpResponse> */
+  update: (httpRequest: httpRequest) => Promise<httpResponse>
+  // delete: (httpRequest: httpRequest) => Promise<httpResponse>
 }
 
 export class Week implements week {
@@ -63,5 +64,54 @@ export class Week implements week {
         reject(new ServerError())
       })
     }
+  }
+
+  async update (httpRequest: httpRequest): Promise<httpResponse> {
+    const requiredParameters = [
+      'id'
+    ]
+    for (const pos of requiredParameters) {
+      if (!httpRequest.body[pos]) {
+        return new Promise(resolve => {
+          resolve(badRequest(new MissingParamError(pos)))
+        })
+      }
+    }
+    const { id } = httpRequest.body
+    const checkIfWeekExist = await query('SELECT * FROM week WHERE user_id = $1', [id])
+    if (checkIfWeekExist.rows.length <= 0) {
+      return new Promise((resolve, reject) => {
+        reject(new ServerError())
+      })
+    }
+    const allWeekDays = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
+    const parameterWasProvided = allWeekDays.find((day) => {
+      let foundParameter
+      for (const param in httpRequest.body) {
+        foundParameter = day === param
+      }
+      return foundParameter
+    })
+    if (!parameterWasProvided) {
+      return new Promise(resolve => {
+        resolve(badRequest(new NotFound('parameter')))
+      })
+    }
+    const paramValue = httpRequest.body[parameterWasProvided]
+    const updatedWeek = await query(`UPDATE week SET ${parameterWasProvided} = $1 WHERE user_id = $2 RETURNING *`, [paramValue, id])
+    if (updatedWeek.rows.length <= 0) {
+      return new Promise((resolve, reject) => {
+        reject(new ServerError())
+      })
+    }
+    return new Promise(resolve => {
+      resolve(ok(updatedWeek.rows))
+    })
+  }
+
+  async delete (httpRequest: httpRequest): Promise<httpResponse> {
+    return new Promise(resolve => {
+      resolve(ok(null))
+    })
   }
 }

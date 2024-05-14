@@ -8,6 +8,7 @@ import postNotes from '../../model/data/notes/routes/notes-post'
 import { deleteNotes } from '../../model/data/notes/routes/notes-delete'
 import patchNotes from '../../model/data/notes/routes/notes-patch'
 import { getWeek } from '../../model/data/week/routes/week-get'
+import { updateWeek } from '../../model/data/week/routes/week-update'
 
 const routes = Router()
 
@@ -22,5 +23,6 @@ routes.delete('/notes', deleteNotes)
 routes.patch('/notes', patchNotes)
 
 routes.get('/week', getWeek)
+routes.patch('/week', updateWeek)
 
 export default routes
