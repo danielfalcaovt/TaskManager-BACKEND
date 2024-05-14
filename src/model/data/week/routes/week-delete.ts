@@ -6,10 +6,11 @@ import type { verifyRequest } from '../week-protocols'
 export async function deleteWeek (req: verifyRequest, res: Response): Promise<any> {
   try {
     const { id } = req.usuario
+    const { dayOfWeek } = req.body
     const httpRequest = {
       body: {
         id,
-        ...req.body
+        dayOfWeek
       }
     }
     const weekQuery = new Week()

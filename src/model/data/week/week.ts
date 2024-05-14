@@ -86,11 +86,11 @@ export class Week implements week {
     }
     const allWeekDays = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
     const parameterWasProvided = allWeekDays.find((day) => {
-      let foundParameter
-      for (const param in httpRequest.body) {
-        foundParameter = day === param
+      let foundDay
+      for (const dayInBody in httpRequest.body) {
+        foundDay = day === dayInBody
       }
-      return foundParameter
+      return foundDay
     })
     if (!parameterWasProvided) {
       return new Promise(resolve => {
@@ -110,8 +110,41 @@ export class Week implements week {
   }
 
   async delete (httpRequest: httpRequest): Promise<httpResponse> {
+    const requiredParameters = [
+      'id',
+      'dayOfWeek'
+    ]
+    for (const pos of requiredParameters) {
+      if (!httpRequest.body[pos]) {
+        return new Promise(resolve => {
+          resolve(badRequest(new MissingParamError(pos)))
+        })
+      }
+    }
+    const { id, dayOfWeek } = httpRequest.body
+    const checkIfWeekExist = await query('SELECT * FROM week WHERE user_id = $1', [id])
+    if (checkIfWeekExist.rows[0][dayOfWeek] === null) {
+      return new Promise((resolve, reject) => {
+        resolve(badRequest(new NotFound('task')))
+      })
+    }
+    const allWeekDays = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
+    const dayWasProvided = allWeekDays.find((day) => {
+      return day === dayOfWeek
+    })
+    if (!dayWasProvided) {
+      return new Promise(resolve => {
+        resolve(badRequest(new MissingParamError('day')))
+      })
+    }
+    const deletedDay = await query(`UPDATE week SET ${dayWasProvided} = null WHERE user_id = $1 RETURNING *`, [id])
+    if (deletedDay.rows.length <= 0) {
+      return new Promise((resolve, reject) => {
+        reject(new ServerError())
+      })
+    }
     return new Promise(resolve => {
-      resolve(ok(null))
+      resolve(ok(deletedDay.rows))
     })
   }
 }

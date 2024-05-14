@@ -11,11 +11,7 @@ export interface verifyRequest extends Request {
   usuario: any
 }
 
-export const verifyUser = async (
-  req: verifyRequest,
-  res: Response,
-  next: NextFunction
-): Promise<any> => {
+export const verifyUser = async (req: verifyRequest, res: Response, next: NextFunction): Promise<any> => {
   try {
     const { authorization } = req.headers
     if (!authorization) {
