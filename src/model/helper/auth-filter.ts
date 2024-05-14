@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable new-cap */
 /* eslint-disable @typescript-eslint/strict-boolean-expressions */
-import jwt from 'jsonwebtoken'
 import type { NextFunction, Request, Response } from 'express'
 import { users } from '../data/users/users'
 import * as dotenv from 'dotenv'
+import { JwtHandler } from '../auth/jwt/jwt'
 dotenv.config()
 
 export interface verifyRequest extends Request {
@@ -18,7 +18,8 @@ export const verifyUser = async (req: verifyRequest, res: Response, next: NextFu
       return res.status(300).json({ error: 'Usuário não autênticado.' })
     }
     const token = authorization.replace('Bearer ', '')
-    const user: any = jwt.verify(token, process.env.JWT_TOKEN)
+    const jwtHandler = new JwtHandler()
+    const user: any = jwtHandler.verify(token, process.env.JWT_TOKEN)
     const userQuery = new users()
     const foundUser = await userQuery.get(user.id)
     if (foundUser) {

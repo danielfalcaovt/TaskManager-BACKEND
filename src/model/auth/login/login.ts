@@ -4,6 +4,7 @@
 import { NotFound } from '../../errors/param-not-found'
 import { authError, badRequest, ok, serverError } from '../../helper/http-helper'
 import type { httpRequest, httpResponse } from '../../protocols/http'
+import type { JwtHandler } from '../jwt/jwt'
 import {
   type EmailValidator,
   type Encrypter,
@@ -11,7 +12,6 @@ import {
   MissingParamError,
   query
 } from './login-protocols'
-import jwt from 'jsonwebtoken'
 
 interface login {
   authenticate: (httpRequest: httpRequest) => Promise<httpResponse>
@@ -20,10 +20,12 @@ interface login {
 export class Login implements login {
   private readonly emailValidator: EmailValidator
   private readonly encrypter: Encrypter
+  private readonly jwtHandler: JwtHandler
 
-  constructor (emailValidator: EmailValidator, encrypter: Encrypter) {
+  constructor (emailValidator: EmailValidator, encrypter: Encrypter, jwtHandler: JwtHandler) {
     this.emailValidator = emailValidator
     this.encrypter = encrypter
+    this.jwtHandler = jwtHandler
   }
 
   async authenticate (httpRequest: httpRequest): Promise<httpResponse> {
@@ -54,9 +56,7 @@ export class Login implements login {
         const passwordMatch = await this.encrypter.compare(password, hashedPassword)
         if (passwordMatch) {
           const { password, ...user } = checkIfUserExist.rows[0]
-          const token = jwt.sign({ id: user.id }, process.env.JWT_TOKEN, {
-            expiresIn: '8hr'
-          })
+          const token = this.jwtHandler.sign({ id: user.id })
           return new Promise((resolve) => {
             resolve(ok({ user, token }))
           })

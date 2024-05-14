@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/return-await */
+import { JwtHandler } from '../jwt/jwt'
 import { Login } from './login'
 import { type EmailValidator, ServerError, InvalidParamError, type Encrypter, MissingParamError } from './login-protocols'
 
@@ -6,15 +7,18 @@ interface sutTypes {
   sut: Login
   emailValidatorStub: EmailValidator
   encrypterStub: Encrypter
+  jwtHandler: JwtHandler
 }
 
 const makeSut = (): sutTypes => {
   const emailValidatorStub = makeEmailValidator()
   const encrypterStub = makeEncrypter()
-  const sut = new Login(emailValidatorStub, encrypterStub)
+  const jwtHandler = new JwtHandler()
+  const sut = new Login(emailValidatorStub, encrypterStub, jwtHandler)
   return {
     emailValidatorStub,
     encrypterStub,
+    jwtHandler,
     sut
   }
 }

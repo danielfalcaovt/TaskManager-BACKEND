@@ -3,6 +3,7 @@
 import type { Request, Response } from 'express'
 import { Login } from './login'
 import { EmailValidator, Encrypter } from './login-protocols'
+import { JwtHandler } from '../jwt/jwt'
 
 export async function loginRoute (req: Request, res: Response): Promise<any> {
   try {
@@ -12,7 +13,8 @@ export async function loginRoute (req: Request, res: Response): Promise<any> {
     }
     const emailValidator = new EmailValidator()
     const encrypter = new Encrypter()
-    const loginQuery = new Login(emailValidator, encrypter)
+    const jwtHandler = new JwtHandler()
+    const loginQuery = new Login(emailValidator, encrypter, jwtHandler)
     const httpResponse = await loginQuery.authenticate(httpRequest)
     return res.status(httpResponse.statusCode).json(httpResponse.body)
   } catch (error) {
