@@ -4,7 +4,7 @@ export const InternalServerErrorTxt = (): string => {
 
 export class ServerError extends Error {
   constructor () {
-    super('Internal Server Error.')
+    super('Erro no Servidor Interno.')
     this.name = 'ServerError'
   }
 }

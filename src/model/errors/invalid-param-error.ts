@@ -1,10 +1,10 @@
 export const InvalidParamErrorTxt = (paramName: string): string => {
-  return `Invalid ${paramName} param has been provided.`
+  return `Parâmetro ${paramName} inválido.`
 }
 
 export class InvalidParamError extends Error {
   constructor (paramName: string) {
-    super(`Invalid ${paramName} param.`)
+    super(`Parâmetro ${paramName} inválido.`)
     this.name = 'InvalidParam'
   }
 }

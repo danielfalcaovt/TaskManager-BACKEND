@@ -11,7 +11,6 @@ export async function loginRoute (req: Request, res: Response): Promise<any> {
     const httpRequest = {
       body
     }
-    console.log(body)
     const emailValidator = new EmailValidator()
     const encrypter = new Encrypter()
     const jwtHandler = new JwtHandler()

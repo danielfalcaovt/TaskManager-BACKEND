@@ -4,7 +4,7 @@ export const MissingParamErrorTxt = (paramName: string): string => {
 
 export class MissingParamError extends Error {
   constructor (paramName: string) {
-    super(`Missing ${paramName} param.`)
+    super(`Parâmetro ${paramName} deve ser preenchido.`)
     this.name = 'MissingParam'
   }
 }
