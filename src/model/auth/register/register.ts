@@ -28,7 +28,7 @@ export class register implements Register {
         'confirmPassword'
       ]
       for (const pos of requiredParameters) {
-        if (!httpRequest.body[pos]) {
+        if (!httpRequest.body[pos] || httpRequest.body[pos].length === 0) {
           return new Promise(resolve => {
             resolve(badRequest(new MissingParamError(pos)))
           })
@@ -80,6 +80,7 @@ export class register implements Register {
         }
       }
     } catch (error) {
+      console.log(error)
       return serverError()
     }
   }

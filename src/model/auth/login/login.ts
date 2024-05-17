@@ -32,7 +32,7 @@ export class Login implements login {
     try {
       const requiredParameters = ['email', 'password']
       for (const pos of requiredParameters) {
-        if (!httpRequest.body[pos]) {
+        if (!httpRequest.body[pos] || httpRequest.body[pos].length === 0) {
           return new Promise((resolve) => {
             resolve(badRequest(new MissingParamError(pos)))
           })
@@ -67,7 +67,7 @@ export class Login implements login {
         }
       } else {
         return new Promise((resolve) => {
-          resolve(badRequest(new NotFound('user')))
+          resolve(badRequest(new NotFound('usuário')))
         })
       }
     } catch (error) {
