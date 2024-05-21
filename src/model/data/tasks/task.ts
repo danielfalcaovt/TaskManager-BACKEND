@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable no-unreachable-loop */
 /* eslint-disable @typescript-eslint/no-confusing-void-expression */
 /* eslint-disable @typescript-eslint/strict-boolean-expressions */
@@ -82,7 +83,8 @@ export class Task implements task {
 
   async update (httpRequest: httpRequest): Promise<httpResponse> {
     const requiredParameters = [
-      'id'
+      'id',
+      'taskId'
     ]
     for (const pos of requiredParameters) {
       if (!httpRequest.body[pos]) {
@@ -91,16 +93,66 @@ export class Task implements task {
         })
       }
     }
-    const { id } = httpRequest.body
+    const { id, taskId } = httpRequest.body
+    const { taskName, taskText, taskDay } = httpRequest.body
+    let updateSetQuery = ''
+    let queryCount = 0
+    const paramsPassed: string[] = []
+    if (taskName) {
+      queryCount++
+      updateSetQuery += `task_name = $${queryCount}`
+      paramsPassed.push(taskName)
+    }
+
+    if (taskText) {
+      if (queryCount > 0) {
+        updateSetQuery += ','
+      }
+      queryCount++
+      updateSetQuery += `task_text = $${queryCount}`
+      paramsPassed.push(taskText)
+    }
+
+    if (taskDay) {
+      if (queryCount > 0) {
+        updateSetQuery += ','
+      }
+      const allDays = ['monday', 'tuesday', 'thursday', 'wednesday', 'friday', 'saturday', 'sunday']
+      const checkIfDayIsValid = allDays.find((day) => {
+        return day === taskDay
+      })
+
+      if (!checkIfDayIsValid) {
+        return new Promise(resolve => {
+          resolve(badRequest(new InvalidParamError('dia')))
+        })
+      }
+      queryCount++
+      updateSetQuery += `task_day = $${queryCount}`
+      paramsPassed.push(taskDay)
+    }
+
+    if (!taskName && !taskText && !taskDay) {
+      return new Promise((resolve) => {
+        resolve(badRequest(new NotFound('Parâmetro')))
+      })
+    }
     const checkIfTaskExist = await query('SELECT * FROM tasks WHERE user_id = $1', [id])
     if (checkIfTaskExist.rows.length <= 0) {
       return new Promise((resolve, reject) => {
         reject(new ServerError())
       })
     } else {
-      return new Promise(resolve => {
-        resolve(ok(''))
-      })
+      const updatedTask = await query(`UPDATE tasks SET ${updateSetQuery} WHERE user_id = '${id}' AND id = '${taskId}' RETURNING *`, paramsPassed)
+      if (updatedTask.rows.length > 0) {
+        return new Promise(resolve => {
+          resolve(ok(updatedTask.rows))
+        })
+      } else {
+        return new Promise((resolve, reject) => {
+          reject(new ServerError())
+        })
+      }
     }
   }
 

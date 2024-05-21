@@ -21,7 +21,7 @@ export const verifyUser = async (req: verifyRequest, res: Response, next: NextFu
     const jwtHandler = new JwtHandler()
     const user: any = jwtHandler.verify(token, process.env.JWT_TOKEN)
     const userQuery = new users()
-    const foundUser = await userQuery.get(user.id.id)
+    const foundUser = await userQuery.get(user.id)
     if (foundUser) {
       req.usuario = foundUser
       next()

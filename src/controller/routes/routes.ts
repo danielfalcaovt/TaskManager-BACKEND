@@ -11,11 +11,15 @@ import { getTasks } from '../../model/data/tasks/routes/task-get'
 import { updateWeek } from '../../model/data/tasks/routes/task-update'
 import { deleteWeek } from '../../model/data/tasks/routes/task-delete'
 import postTask from '../../model/data/tasks/routes/task-post'
+import ForgotPasswordRoute from '../../model/auth/forgot-password/forgotPasswordRoute'
+import ConfirmPasswordRoute from '../../model/auth/forgot-password/confirmPasswordRoute'
 
 const routes = Router()
 
 routes.post('/register', registerRoute)
 routes.post('/login', loginRoute)
+routes.post('/forget', ForgotPasswordRoute)
+routes.post('/confirm', ConfirmPasswordRoute)
 
 routes.use(verifyUser)
 
