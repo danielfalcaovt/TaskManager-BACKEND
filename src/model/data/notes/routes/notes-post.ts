@@ -4,7 +4,7 @@
 import type { Request, Response } from 'express'
 import { notes } from '../note-protocols'
 
-interface newRequest extends Request {
+export interface newRequest extends Request {
   usuario: any
 }
 

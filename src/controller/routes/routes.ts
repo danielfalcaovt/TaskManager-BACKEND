@@ -7,9 +7,10 @@ import getNotes from '../../model/data/notes/routes/notes-get'
 import postNotes from '../../model/data/notes/routes/notes-post'
 import { deleteNotes } from '../../model/data/notes/routes/notes-delete'
 import patchNotes from '../../model/data/notes/routes/notes-patch'
-import { getWeek } from '../../model/data/week/routes/week-get'
-import { updateWeek } from '../../model/data/week/routes/week-update'
-import { deleteWeek } from '../../model/data/week/routes/week-delete'
+import { getTasks } from '../../model/data/tasks/routes/task-get'
+import { updateWeek } from '../../model/data/tasks/routes/task-update'
+import { deleteWeek } from '../../model/data/tasks/routes/task-delete'
+import postTask from '../../model/data/tasks/routes/task-post'
 
 const routes = Router()
 
@@ -23,8 +24,9 @@ routes.post('/notes', postNotes)
 routes.delete('/notes', deleteNotes)
 routes.patch('/notes', patchNotes)
 
-routes.get('/week', getWeek)
-routes.patch('/week', updateWeek)
-routes.delete('/week', deleteWeek)
+routes.get('/tasks', getTasks)
+routes.post('/tasks', postTask)
+routes.patch('/tasks', updateWeek)
+routes.delete('/tasks', deleteWeek)
 
 export default routes

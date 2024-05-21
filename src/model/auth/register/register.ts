@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/return-await */
 /* eslint-disable @typescript-eslint/strict-boolean-expressions */
-import { Week } from '../../data/week/week'
+import { Task } from '../../data/tasks/task'
 import { badRequest, ok, serverError } from '../../helper/http-helper'
 import type { httpRequest, httpResponse } from '../../protocols/http'
 import { type EmailValidator, type Encrypter, InvalidParamError, MissingParamError, query } from './register-protocols'
@@ -66,7 +66,7 @@ export class register implements Register {
         )
         if (insertUserAndReturnIfSuccess.rows.length > 0) {
           const user = insertUserAndReturnIfSuccess.rows[0]
-          const createUserWeek = new Week()
+          const createUserWeek = new Task()
           const weekCreation = await createUserWeek.post(user.id) // CREATE USER WEEK TABLE
           if (weekCreation.statusCode === 200) {
             return new Promise(resolve => {

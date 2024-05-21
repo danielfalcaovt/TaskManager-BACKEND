@@ -7,6 +7,7 @@ declare global {
       PG_PORT: number
       PG_PASSWORD: string
       JWT_TOKEN: string
+      SENDGRID_APIKEY: string
     }
   }
 }

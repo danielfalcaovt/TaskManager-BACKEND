@@ -21,7 +21,7 @@ export const verifyUser = async (req: verifyRequest, res: Response, next: NextFu
     const jwtHandler = new JwtHandler()
     const user: any = jwtHandler.verify(token, process.env.JWT_TOKEN)
     const userQuery = new users()
-    const foundUser = await userQuery.get(user.id)
+    const foundUser = await userQuery.get(user.id.id)
     if (foundUser) {
       req.usuario = foundUser
       next()
@@ -29,6 +29,7 @@ export const verifyUser = async (req: verifyRequest, res: Response, next: NextFu
       return res.status(300).json({ error: 'Usuário não encontrado.' })
     }
   } catch (error) {
+    console.log(error)
     return res.status(500).json({ error: 'Erro no Servidor Interno.' })
   }
 }

@@ -14,6 +14,7 @@ export class users implements userQueries {
     const user = await query('SELECT * FROM users WHERE id = $1', [id])
     if (user.rows.length > 0) {
       const userFound = user.rows[0]
+      console.log(userFound)
       return new Promise((resolve, reject) => {
         resolve(userFound)
       })

@@ -12,7 +12,7 @@ export class JwtHandler implements jwtHandler {
     if (!id) {
       throw new ServerError()
     }
-    const token = jwt.sign({ id }, process.env.JWT_TOKEN, { expiresIn: '8hr' })
+    const token = jwt.sign(id, process.env.JWT_TOKEN, { expiresIn: '8hr' })
     return token
   }
 
