@@ -14,7 +14,7 @@ interface task {
   get: (httpRequest: httpRequest) => Promise<httpResponse>
   post: (httpRequest: httpRequest) => Promise<httpResponse>
   update: (httpRequest: httpRequest) => Promise<httpResponse>
-  // delete: (httpRequest: httpRequest) => Promise<httpResponse>
+  delete: (httpRequest: httpRequest) => Promise<httpResponse>
 }
 
 export class Task implements task {
