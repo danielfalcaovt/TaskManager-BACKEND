@@ -62,12 +62,12 @@ export class Login implements login {
           })
         } else {
           return new Promise((resolve) => {
-            resolve(authError())
+            resolve(authError(new Error('Senha incorreta')))
           })
         }
       } else {
         return new Promise((resolve) => {
-          resolve(badRequest(new NotFound('usuário')))
+          resolve(badRequest(new NotFound('Usuário')))
         })
       }
     } catch (error) {

@@ -15,10 +15,10 @@ export const ok = (body: any): httpResponse => {
   }
 }
 
-export const authError = (): httpResponse => {
+export const authError = (error: Error): httpResponse => {
   return {
     statusCode: 300,
-    body: 'Falha na autênticação.'
+    body: error.message
   }
 }
 
