@@ -54,7 +54,7 @@ export class Task implements task {
       }
     }
     const { id, taskDay, taskMonth } = httpRequest.body
-    if (Number(taskMonth) <= 0 || Number(taskMonth) > 12) {
+    if (Number(taskMonth) < 0 || Number(taskMonth) > 11) {
       return new Promise(resolve => {
         resolve(serverError())
       })
@@ -68,7 +68,7 @@ export class Task implements task {
         })
       } else {
         return new Promise((resolve) => {
-          resolve(badRequest(new NotFound('task')))
+          resolve(ok('Tarefa não encontrada.'))
         })
       }
     } else {

@@ -6,6 +6,7 @@ export async function getFilteredTask (req: verifyRequest, res: Response): Promi
   try {
     const { id } = req.usuario
     const { body } = req
+    console.log(body)
     const httpRequest = {
       body: {
         id,
