@@ -30,8 +30,8 @@ routes.delete('/notes', deleteNotes)
 routes.patch('/notes', patchNotes)
 
 routes.get('/tasks', getTasks)
-routes.post('/tasks/filter', getFilteredTask)
 routes.post('/tasks', postTask)
+routes.post('/tasks/filter', getFilteredTask)
 routes.patch('/tasks', updateWeek)
 routes.delete('/tasks', deleteWeek)
 
