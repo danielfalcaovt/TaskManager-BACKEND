@@ -51,12 +51,12 @@ export class register implements Register {
       const hashedPassword = await this.encrypter.encrypt(password)
 
       const checkIfUserExist = await query(
-        'SELECT * FROM users WHERE username = $1 OR email = $2',
-        [username, email]
+        'SELECT * FROM users WHERE email = $1',
+        [email]
       )
       if (checkIfUserExist.rows.length > 0) {
         return new Promise(resolve => {
-          resolve(badRequest(new Error('Usuário já existente.')))
+          resolve(badRequest(new Error('Email já cadastrado.')))
         })
       } else {
         const insertUserAndReturnIfSuccess = await query(

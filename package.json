@@ -8,6 +8,7 @@
     "dotenv": "^16.4.5",
     "eslint-config-standard-with-typescript": "^43.0.1",
     "express": "^4.19.2",
+    "express-rate-limit": "^7.3.0",
     "husky": "^9.0.11",
     "jsonwebtoken": "^9.0.2",
     "lint-staged": "^15.2.2",
