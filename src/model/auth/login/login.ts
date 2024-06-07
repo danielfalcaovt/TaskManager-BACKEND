@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-for-in-array */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/return-await */
 /* eslint-disable @typescript-eslint/strict-boolean-expressions */
@@ -47,17 +48,14 @@ export class Login implements login {
         })
       }
 
-      const checkIfUserExist = await query(
-        'SELECT * FROM users WHERE email = $1',
-        [email]
-      )
+      const checkIfUserExist = await query('SELECT * FROM users WHERE email = $1', [email])
       if (checkIfUserExist.rows.length > 0) {
         const { password: hashedPassword } = checkIfUserExist.rows[0]
         const passwordMatch = await this.encrypter.compare(password, hashedPassword)
         if (passwordMatch) {
           const { password, ...user } = checkIfUserExist.rows[0]
           const token = this.jwtHandler.sign({ id: user.id })
-          return new Promise((resolve) => {
+          return new Promise(resolve => {
             resolve(ok({ user, token }))
           })
         } else {
@@ -71,6 +69,7 @@ export class Login implements login {
         })
       }
     } catch (error) {
+      console.log(error)
       return serverError()
     }
   }

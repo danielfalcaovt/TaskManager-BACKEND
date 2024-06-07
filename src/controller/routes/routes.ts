@@ -14,6 +14,7 @@ import postTask from '../../model/data/tasks/routes/task-post'
 import ForgotPasswordRoute from '../../model/auth/forgot-password/forgotPasswordRoute'
 import ConfirmPasswordRoute from '../../model/auth/forgot-password/confirmPasswordRoute'
 import { getFilteredTask } from '../../model/data/tasks/routes/task-filter-get'
+import getUser from '../../model/data/users/routes/getUser'
 
 const routes = Router()
 
@@ -23,6 +24,8 @@ routes.post('/forget', ForgotPasswordRoute)
 routes.post('/confirm', ConfirmPasswordRoute)
 
 routes.use(verifyUser)
+
+routes.get('/user', getUser)
 
 routes.get('/notes', getNotes)
 routes.post('/notes', postNotes)

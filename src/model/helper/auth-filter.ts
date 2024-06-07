@@ -2,7 +2,7 @@
 /* eslint-disable new-cap */
 /* eslint-disable @typescript-eslint/strict-boolean-expressions */
 import type { NextFunction, Request, Response } from 'express'
-import { users } from '../data/users/users'
+import { Users } from '../data/users/users'
 import * as dotenv from 'dotenv'
 import { JwtHandler } from '../auth/jwt/jwt'
 dotenv.config()
@@ -20,8 +20,13 @@ export const verifyUser = async (req: verifyRequest, res: Response, next: NextFu
     const token = authorization.replace('Bearer ', '')
     const jwtHandler = new JwtHandler()
     const user: any = jwtHandler.verify(token, process.env.JWT_TOKEN)
-    const userQuery = new users()
-    const foundUser = await userQuery.get(user.id)
+    const userQuery = new Users()
+    const httpRequest = {
+      body: {
+        id: user.id
+      }
+    }
+    const foundUser = await userQuery.get(httpRequest)
     if (foundUser) {
       req.usuario = foundUser
       next()
