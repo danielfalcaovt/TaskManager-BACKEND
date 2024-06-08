@@ -5,7 +5,7 @@ import type { verifyRequest } from '../task-protocols'
 
 export async function updateWeek (req: verifyRequest, res: Response): Promise<any> {
   try {
-    const { id } = req.usuario
+    const { id } = req.usuario.body
     const httpRequest = {
       body: {
         id,

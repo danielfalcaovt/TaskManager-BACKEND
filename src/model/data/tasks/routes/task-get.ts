@@ -4,13 +4,13 @@ import type { verifyRequest } from '../task-protocols'
 
 export async function getTasks (req: verifyRequest, res: Response): Promise<any> {
   try {
-    const { id } = req.usuario
+    const { id } = req.usuario.body
+    console.log(req.usuario)
     const httpRequest = {
       body: {
         id
       }
     }
-    console.log('to aqui')
     const taskQuery = new Task()
     const httpResponse = await taskQuery.get(httpRequest)
     return res.status(httpResponse.statusCode).json(httpResponse.body)

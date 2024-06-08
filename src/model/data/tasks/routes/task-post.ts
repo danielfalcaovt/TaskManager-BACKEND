@@ -4,7 +4,7 @@ import type { newRequest } from '../../notes/routes/notes-post'
 
 export default async function postTask (req: newRequest, res: Response): Promise<any> {
   try {
-    const { id } = req.usuario
+    const { id } = req.usuario.body
     const { body } = req
     const httpRequest = {
       body: {

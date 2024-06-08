@@ -4,9 +4,8 @@ import type { verifyRequest } from '../task-protocols'
 
 export async function getFilteredTask (req: verifyRequest, res: Response): Promise<any> {
   try {
-    const { id } = req.usuario
+    const { id } = req.usuario.body
     const { body } = req
-    console.log(body)
     const httpRequest = {
       body: {
         id,

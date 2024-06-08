@@ -68,7 +68,7 @@ export class Task implements task {
         })
       } else {
         return new Promise((resolve) => {
-          resolve(ok('Tarefa não encontrada.'))
+          resolve(ok({ error: 'Tarefa não encontrada', task_day: taskDay, task_month: taskMonth }))
         })
       }
     } else {

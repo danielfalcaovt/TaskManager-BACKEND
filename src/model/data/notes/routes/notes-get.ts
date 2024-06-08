@@ -6,7 +6,7 @@ import { notes, type verifyRequest } from '../note-protocols'
 
 export default async function getNotes (req: verifyRequest, res: Response): Promise<any> {
   try {
-    const { id } = req.usuario
+    const { id } = req.usuario.body
     const notesQuery = new notes()
     const httpResponse = await notesQuery.get({ body: { id } })
     return res.status(httpResponse.statusCode).json(httpResponse.body)
