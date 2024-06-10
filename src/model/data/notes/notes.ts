@@ -37,7 +37,7 @@ export class notes implements noteQueries {
 
     const { ...user } = httpRequest.body
 
-    const allNotes = await query('SELECT * FROM notes WHERE user_id = $1', [
+    const allNotes = await query('SELECT * FROM notes WHERE user_id = $1 ORDER BY notes.timestamp DESC', [
       user.id
     ])
     if (allNotes.rows.length > 0) {
@@ -61,10 +61,16 @@ export class notes implements noteQueries {
       }
     }
 
+    if (httpRequest.body.noteTitle >= 50 || httpRequest.body.noteText >= 255) {
+      return new Promise(resolve => {
+        resolve(badRequest(new Error('Character limit exceeded')))
+      })
+    }
+
     const { ...note } = httpRequest.body
 
     const whenWasSentTheNote = Date.now()
-    const queryResult = await query('INSERT INTO notes(note_title, note_text, user_id, when_was_sent) VALUES($1,$2,$3,$4) RETURNING *', [note.noteTitle, note.noteText, note.userId, String(whenWasSentTheNote)])
+    const queryResult = await query('INSERT INTO notes(note_title, note_text, user_id, timestamp) VALUES($1,$2,$3,$4) RETURNING *', [note.noteTitle, note.noteText, note.userId, String(whenWasSentTheNote)])
     if (queryResult.rows.length > 0) {
       return new Promise((resolve, reject) => {
         resolve(ok(queryResult.rows[0]))
