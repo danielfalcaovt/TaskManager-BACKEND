@@ -92,7 +92,7 @@ export class ForgotPassword implements forgotPassword {
         const expirationDay = new Date(expirationtimeinunix)
         if (actuallyDay >= expirationDay) {
           return new Promise((resolve, reject) => {
-            resolve(authError())
+            resolve(authError(new Error('Não autorizado')))
           })
         }
         return new Promise((resolve, reject) => {

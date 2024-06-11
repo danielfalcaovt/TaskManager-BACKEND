@@ -7,9 +7,12 @@ import { notes } from '../notes'
 
 export async function deleteNotes (req: Request, res: Response): Promise<any> {
   try {
-    const { body } = req
+    const { userId, noteId } = req.params
     const httpRequest = {
-      body
+      body: {
+        userId,
+        noteId
+      }
     }
     const noteQueries = new notes()
     const httpResponse = await noteQueries.delete(httpRequest)

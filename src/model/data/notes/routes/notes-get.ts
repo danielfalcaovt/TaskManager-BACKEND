@@ -4,7 +4,7 @@
 import type { Response } from 'express'
 import { notes, type verifyRequest } from '../note-protocols'
 
-export default async function getNotes (req: verifyRequest, res: Response): Promise<any> {
+export async function getNotes (req: verifyRequest, res: Response): Promise<any> {
   try {
     const { id } = req.usuario.body
     const notesQuery = new notes()

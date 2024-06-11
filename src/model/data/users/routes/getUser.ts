@@ -4,7 +4,7 @@ import { type Response } from 'express'
 import { type verifyRequest } from '../../notes/note-protocols'
 import { Users } from '../users'
 
-export default async function getUser (req: verifyRequest, res: Response): Promise<any> {
+export async function getUser (req: verifyRequest, res: Response): Promise<any> {
   try {
     const { id } = req.usuario.body
     const usersQuery = new Users()

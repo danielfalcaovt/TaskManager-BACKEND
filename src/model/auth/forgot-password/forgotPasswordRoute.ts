@@ -2,7 +2,7 @@ import type { Response } from 'express'
 import type { newRequest } from '../../data/notes/routes/notes-post'
 import { ForgotPassword } from './forgotPassword'
 
-export default async function ForgotPasswordRoute (req: newRequest, res: Response): Promise<any> {
+export async function ForgotPasswordRoute (req: newRequest, res: Response): Promise<any> {
   try {
     const { email } = req.body
     const httpRequest = {

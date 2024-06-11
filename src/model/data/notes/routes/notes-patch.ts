@@ -8,7 +8,7 @@ interface newRequest extends Request {
   usuario: any
 }
 
-export default async function patchNotes (req: newRequest, res: Response): Promise<any> {
+export async function patchNotes (req: newRequest, res: Response): Promise<any> {
   try {
     const { body } = req
     const noteQueries = new notes()

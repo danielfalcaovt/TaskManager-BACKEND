@@ -8,7 +8,7 @@ export interface newRequest extends Request {
   usuario: any
 }
 
-export default async function postNotes (req: newRequest, res: Response): Promise<any> {
+export async function postNotes (req: newRequest, res: Response): Promise<any> {
   try {
     const { body } = req
     body.userId = req.usuario.body.id

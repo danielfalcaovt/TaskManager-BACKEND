@@ -2,7 +2,7 @@ import type { Response } from 'express'
 import { Task } from '../task'
 import type { newRequest } from '../../notes/routes/notes-post'
 
-export default async function postTask (req: newRequest, res: Response): Promise<any> {
+export async function postTask (req: newRequest, res: Response): Promise<any> {
   try {
     const { id } = req.usuario.body
     const { body } = req
