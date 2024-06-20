@@ -10,7 +10,7 @@ interface notification {
 
 export class Notification implements notification {
   async get (): Promise<httpResponse> {
-    const dbResponse = await query('SELECT * FROM notifications')
+    const dbResponse = await query('SELECT * FROM notification')
     if (dbResponse.rows.length > 0) {
       return new Promise(resolve => {
         resolve(ok(dbResponse.rows))
