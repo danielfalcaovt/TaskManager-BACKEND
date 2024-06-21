@@ -31,8 +31,17 @@ export class Task implements task {
       }
     }
     const { id } = httpRequest.body
+    const month = new Date().getMonth() + 1
 
     const userWeekDays = await query('SELECT * FROM tasks WHERE user_id = $1', [id])
+    // CHECA SE OS DADOS RECEBIDOS POSSUEM ALGUMA TAREFA QUE SEJA MENOR QUE O MÊS ATUAL
+    const checkResult = userWeekDays.rows.filter((day) => {
+      return day.task_month < month
+    })
+    if (checkResult) {
+      // DELETA TODAS AS TAREFAS QUE SEJAM MENOR DO QUE O MÊS ATUAL OU SEJA VENCIDAS.
+      await query('DELETE FROM tasks WHERE task_month < $1 RETURNING *', [String(month)])
+    }
     if (userWeekDays.rows.length > 0) {
       return new Promise(resolve => {
         resolve(ok(userWeekDays.rows))
