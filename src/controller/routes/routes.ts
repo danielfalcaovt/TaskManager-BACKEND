@@ -22,7 +22,7 @@ routes.get('/tasks', getTasks)
 routes.post('/tasks', postTask)
 routes.post('/tasks/filter', getFilteredTask)
 routes.patch('/tasks', updateWeek)
-routes.delete('/tasks', deleteWeek)
+routes.delete('/tasks/:userId/:taskId', deleteWeek)
 
 routes.get('/notification', getNotification)
 

@@ -34,7 +34,7 @@ export class Task implements task {
     const month = new Date().getMonth() + 1
 
     const userWeekDays = await query('SELECT * FROM tasks WHERE user_id = $1', [id])
-    // CHECA SE OS DADOS RECEBIDOS POSSUEM ALGUMA TAREFA QUE SEJA MENOR QUE O MÊS ATUAL
+    // CHECA SE OS DADOS RECEBIDOS POSSUEM ALGUMA TAREFA QUE O MÊS SEJA MENOR QUE O MÊS ATUAL
     const checkResult = userWeekDays.rows.filter((day) => {
       return day.task_month < month
     })
@@ -206,7 +206,7 @@ export class Task implements task {
 
   async delete (httpRequest: httpRequest): Promise<httpResponse> {
     const requiredParameters = [
-      'id',
+      'userId',
       'taskId'
     ]
     for (const pos of requiredParameters) {
@@ -216,14 +216,15 @@ export class Task implements task {
         })
       }
     }
-    const { id, taskId } = httpRequest.body
-    const checkIfWeekExist = await query('SELECT * FROM week WHERE user_id = $1 AND task_id = $2', [id, taskId])
+    const { taskId, userId } = httpRequest.body
+    const checkIfWeekExist = await query('SELECT * FROM tasks WHERE user_id = $1 AND task_id = $2', [userId, taskId])
     if (checkIfWeekExist.rows.length <= 0) {
       return new Promise((resolve, reject) => {
         resolve(badRequest(new NotFound('task')))
       })
     }
-    const deletedDay = await query('DELETE FROM tasks WHERE user_id = $1 AND task_id = $2 RETURNING *', [id, taskId])
+    const deletedDay = await query('DELETE FROM tasks WHERE user_id = $1 AND task_id = $2 RETURNING *', [userId, taskId])
+    console.log(deletedDay)
     if (deletedDay.rows.length > 0) {
       return new Promise(resolve => {
         resolve(ok(deletedDay.rows))

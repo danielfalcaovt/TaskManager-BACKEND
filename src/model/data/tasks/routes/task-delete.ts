@@ -5,11 +5,10 @@ import type { verifyRequest } from '../task-protocols'
 
 export async function deleteWeek (req: verifyRequest, res: Response): Promise<any> {
   try {
-    const { id } = req.usuario.body
-    const { taskId } = req.body
+    const { userId, taskId } = req.params
     const httpRequest = {
       body: {
-        id,
+        userId,
         taskId
       }
     }
