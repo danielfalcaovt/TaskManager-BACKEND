@@ -1,14 +1,11 @@
 import type { Response } from 'express'
 import { Task } from '../task'
-import type { verifyRequest } from '../task-protocols'
 
-export async function getFilteredTask (req: verifyRequest, res: Response): Promise<any> {
+export async function getFilteredTask (req: Request, res: Response): Promise<any> {
   try {
-    const { id } = req.usuario.body
     const { body } = req
     const httpRequest = {
       body: {
-        id,
         ...body
       }
     }
