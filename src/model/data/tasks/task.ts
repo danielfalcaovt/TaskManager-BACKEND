@@ -54,7 +54,7 @@ export class Task implements task {
   }
 
   async getOne (httpRequest: httpRequest): Promise<httpResponse> {
-    const requiredParameters = ['id', 'taskDay', 'taskMonth']
+    const requiredParameters = ['userId', 'taskDay', 'taskMonth']
     for (const pos of requiredParameters) {
       if (!httpRequest.body[pos]) {
         return new Promise((resolve) => {
@@ -62,7 +62,7 @@ export class Task implements task {
         })
       }
     }
-    const { id, taskDay, taskMonth } = httpRequest.body
+    const { userId, taskDay, taskMonth } = httpRequest.body
     if (Number(taskMonth) < 0 || Number(taskMonth) > 11) {
       return new Promise(resolve => {
         resolve(serverError())
@@ -70,7 +70,7 @@ export class Task implements task {
     }
 
     if (taskDay >= 1 && taskDay <= 31) {
-      const foundTask = await query('SELECT * FROM tasks WHERE user_id = $1 AND task_day = $2 AND task_month = $3', [id, taskDay, taskMonth])
+      const foundTask = await query('SELECT * FROM tasks WHERE user_id = $1 AND task_day = $2 AND task_month = $3', [userId, taskDay, taskMonth])
       if (foundTask.rows.length >= 1) {
         return new Promise((resolve) => {
           resolve(ok(foundTask.rows))

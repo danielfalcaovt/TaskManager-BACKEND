@@ -11,6 +11,7 @@ export async function getFilteredTask (req: Request, res: Response): Promise<any
     }
     const taskQuery = new Task()
     const httpResponse = await taskQuery.getOne(httpRequest)
+    console.log(httpResponse)
     return res.status(httpResponse.statusCode).json(httpResponse.body)
   } catch (error) {
     console.log(error)
