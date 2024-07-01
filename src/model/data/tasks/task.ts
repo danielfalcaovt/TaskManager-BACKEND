@@ -31,16 +31,17 @@ export class Task implements task {
       }
     }
     const { id } = httpRequest.body
-    const month = new Date().getMonth() + 1
-
-    const userWeekDays = await query('SELECT * FROM tasks WHERE user_id = $1', [id])
-    // CHECA SE OS DADOS RECEBIDOS POSSUEM ALGUMA TAREFA QUE O MÊS SEJA MENOR QUE O MÊS ATUAL
+    const month = new Date().getMonth()
+    const userWeekDays = await query('SELECT * FROM tasks WHERE user_id = $1 ORDER BY CAST(task_month AS INTEGER), CAST(task_day AS INTEGER) ASC', [id])
+    console.log(userWeekDays.rows)
+    // CHECA SE NOS DADOS RECEBIDOS EXISTE ALGUMA TAREFA QUE O MÊS SEJA MENOR QUE O MÊS ATUAL
     const checkResult = userWeekDays.rows.filter((day) => {
       return day.task_month < month
     })
     if (checkResult) {
       // DELETA TODAS AS TAREFAS QUE SEJAM MENOR DO QUE O MÊS ATUAL OU SEJA VENCIDAS.
-      await query('DELETE FROM tasks WHERE task_month < $1 RETURNING *', [String(month)])
+      // CONVERTE TASK_MONTH PARA INTEIRO PARA CONDICIONAL NAO DAR ERRO AO POSSUIR UM NUMERO MAIOR QUE 10
+      await query('DELETE FROM tasks WHERE CAST(task_month AS INTEGER) < $1 RETURNING *', [String(month)])
     }
     if (userWeekDays.rows.length > 0) {
       return new Promise(resolve => {
@@ -56,7 +57,8 @@ export class Task implements task {
   async getOne (httpRequest: httpRequest): Promise<httpResponse> {
     const requiredParameters = ['id', 'taskDay', 'taskMonth']
     for (const pos of requiredParameters) {
-      if (!httpRequest.body[pos]) {
+      if (httpRequest.body[pos] === undefined || httpRequest.body[pos] === null) {
+        console.log(httpRequest.body[pos])
         return new Promise((resolve) => {
           resolve(badRequest(new MissingParamError(pos)))
         })
@@ -88,16 +90,17 @@ export class Task implements task {
   }
 
   async post (httpRequest: httpRequest): Promise<httpResponse> {
-    const requiredParameters = ['id', 'taskName', 'taskText', 'taskDay', 'taskMonth']
+    const requiredParameters = ['id', 'taskTitle', 'taskText', 'taskDay', 'taskMonth']
     for (const pos of requiredParameters) {
-      if (!httpRequest.body[pos]) {
+      if (httpRequest.body[pos] === undefined || httpRequest.body[pos] === null) {
+        console.log(httpRequest.body[pos])
         return new Promise((resolve) => {
           resolve(badRequest(new MissingParamError(pos)))
         })
       }
     }
-    const { id, taskName, taskText, taskDay, taskMonth } = httpRequest.body
-    if (Number(taskMonth) <= 0 || Number(taskMonth) > 12) {
+    const { id, taskTitle, taskText, taskDay, taskMonth } = httpRequest.body
+    if (Number(taskMonth) < 0 || Number(taskMonth) > 11) {
       return new Promise(resolve => {
         // RETORNA SERVER ERROR CASO O FRONTEND ENVIE UM MES INVALIDO
         resolve(serverError())
@@ -110,7 +113,7 @@ export class Task implements task {
           resolve(badRequest(new NotFound('Usuário')))
         })
       } else {
-        const newTask = await query('INSERT INTO tasks(user_id, task_name, task_text, task_day, task_month) VALUES($1,$2,$3,$4,$5) RETURNING *', [id, taskName, taskText, taskDay, taskMonth])
+        const newTask = await query('INSERT INTO tasks(user_id, task_title, task_text, task_day, task_month) VALUES($1,$2,$3,$4,$5) RETURNING *', [id, taskTitle, taskText, taskDay, taskMonth])
         if (newTask.rows.length > 0) {
           return new Promise((resolve) => {
             resolve(ok(newTask.rows))
@@ -141,14 +144,14 @@ export class Task implements task {
       }
     }
     const { id, taskId } = httpRequest.body
-    const { taskName, taskText, taskDay } = httpRequest.body
+    const { taskTitle, taskText, taskDay } = httpRequest.body
     let updateSetQuery = ''
     let queryCount = 0
     const paramsPassed: string[] = []
-    if (taskName) {
+    if (taskTitle) {
       queryCount++
-      updateSetQuery += `task_name = $${queryCount}`
-      paramsPassed.push(taskName)
+      updateSetQuery += `task_title = $${queryCount}`
+      paramsPassed.push(taskTitle)
     }
 
     if (taskText) {
@@ -179,7 +182,7 @@ export class Task implements task {
       paramsPassed.push(taskDay)
     }
 
-    if (!taskName && !taskText && !taskDay) {
+    if (!taskTitle && !taskText && !taskDay) {
       return new Promise((resolve) => {
         resolve(badRequest(new NotFound('Parâmetro')))
       })
