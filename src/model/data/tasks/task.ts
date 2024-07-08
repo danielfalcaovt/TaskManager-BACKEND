@@ -241,6 +241,38 @@ export class Task implements task {
   }
 
   async deleteAll (httpRequest: httpRequest): Promise<httpResponse> {
-
+    const requiredParameters = [
+      'userId',
+      'sure'
+    ]
+    for (const pos of requiredParameters) {
+      if (!httpRequest.body[pos]) {
+        return new Promise(resolve => {
+          resolve(badRequest(new MissingParamError(pos)))
+        })
+      }
+    }
+    const { userId, sure } = httpRequest.body
+    const checkIfTaskExist = await query('SELECT * FROM tasks WHERE user_id = $1', [userId])
+    if (checkIfTaskExist.rows.length <= 0) {
+      return new Promise((resolve, reject) => {
+        resolve(badRequest(new NotFound('task')))
+      })
+    }
+    if (!sure) {
+      return new Promise(resolve => {
+        resolve(badRequest(new InvalidParamError('Must confirm to delete all tasks.')))
+      })
+    }
+    const deletedDay = await query('DELETE FROM tasks WHERE user_id = $1 RETURNING *', [userId])
+    if (deletedDay.rows.length > 0) {
+      return new Promise(resolve => {
+        resolve(ok(deletedDay.rows))
+      })
+    } else {
+      return new Promise((resolve, reject) => {
+        reject(new ServerError())
+      })
+    }
   }
 }
