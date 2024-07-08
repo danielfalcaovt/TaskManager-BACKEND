@@ -16,6 +16,7 @@ interface task {
   post: (httpRequest: httpRequest) => Promise<httpResponse>
   update: (httpRequest: httpRequest) => Promise<httpResponse>
   delete: (httpRequest: httpRequest) => Promise<httpResponse>
+  deleteAll: (httpRequest: httpRequest) => Promise<httpResponse>
 }
 
 export class Task implements task {
@@ -32,10 +33,10 @@ export class Task implements task {
     }
     const { id } = httpRequest.body
     const month = new Date().getMonth()
-    const userWeekDays = await query('SELECT * FROM tasks WHERE user_id = $1 ORDER BY CAST(task_month AS INTEGER), CAST(task_day AS INTEGER) ASC', [id])
-    console.log(userWeekDays.rows)
+    const userTaskDays = await query('SELECT * FROM tasks WHERE user_id = $1 ORDER BY CAST(task_month AS INTEGER), CAST(task_day AS INTEGER) ASC', [id])
+    console.log(userTaskDays.rows)
     // CHECA SE NOS DADOS RECEBIDOS EXISTE ALGUMA TAREFA QUE O MÊS SEJA MENOR QUE O MÊS ATUAL
-    const checkResult = userWeekDays.rows.filter((day) => {
+    const checkResult = userTaskDays.rows.filter((day) => {
       return day.task_month < month
     })
     if (checkResult) {
@@ -43,9 +44,9 @@ export class Task implements task {
       // CONVERTE TASK_MONTH PARA INTEIRO PARA CONDICIONAL NAO DAR ERRO AO POSSUIR UM NUMERO MAIOR QUE 10
       await query('DELETE FROM tasks WHERE CAST(task_month AS INTEGER) < $1 RETURNING *', [String(month)])
     }
-    if (userWeekDays.rows.length > 0) {
+    if (userTaskDays.rows.length > 0) {
       return new Promise(resolve => {
-        resolve(ok(userWeekDays.rows))
+        resolve(ok(userTaskDays.rows))
       })
     } else {
       return new Promise(resolve => [
@@ -220,8 +221,8 @@ export class Task implements task {
       }
     }
     const { taskId, userId } = httpRequest.body
-    const checkIfWeekExist = await query('SELECT * FROM tasks WHERE user_id = $1 AND task_id = $2', [userId, taskId])
-    if (checkIfWeekExist.rows.length <= 0) {
+    const checkIfTaskExist = await query('SELECT * FROM tasks WHERE user_id = $1 AND task_id = $2', [userId, taskId])
+    if (checkIfTaskExist.rows.length <= 0) {
       return new Promise((resolve, reject) => {
         resolve(badRequest(new NotFound('task')))
       })
@@ -237,5 +238,9 @@ export class Task implements task {
         reject(new ServerError())
       })
     }
+  }
+
+  async deleteAll (httpRequest: httpRequest): Promise<httpResponse> {
+
   }
 }
