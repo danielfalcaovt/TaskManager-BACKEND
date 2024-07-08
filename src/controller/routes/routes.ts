@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 import { Router } from 'express'
-import { deleteNotes, ConfirmPasswordRoute, ForgotPasswordRoute, getNotes, getUser, patchNotes, postNotes, postTask, deleteWeek, getFilteredTask, getNotification, getTasks, loginRoute, registerRoute, updateWeek, verifyUser } from './routes-protocols'
+import { deleteNotes, ConfirmPasswordRoute, ForgotPasswordRoute, getNotes, getUser, patchNotes, postNotes, postTask, deleteTask, getFilteredTask, getNotification, getTasks, loginRoute, registerRoute, updateWeek, verifyUser } from './routes-protocols'
+import { deleteAllTasks } from '../../model/data/tasks/routes/task-delete-all'
 
 const routes = Router()
 
@@ -22,7 +23,8 @@ routes.get('/tasks', getTasks)
 routes.post('/tasks', postTask)
 routes.post('/tasks/filter', getFilteredTask)
 routes.patch('/tasks', updateWeek)
-routes.delete('/tasks/:userId/:taskId', deleteWeek)
+routes.delete('/tasks/:userId/:taskId', deleteTask)
+routes.delete('/tasks/:userId/:sure/all', deleteAllTasks)
 
 routes.get('/notification', getNotification)
 
