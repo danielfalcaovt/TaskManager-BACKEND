@@ -24,7 +24,7 @@ describe('Task', () => {
     const sut = makeSut()
     const httpRequest = {
       body: {
-        taskName: 'any_name',
+        taskTitle: 'any_name',
         taskText: 'any_text',
         taskDay: 'monday'
       }
@@ -33,7 +33,7 @@ describe('Task', () => {
     expect(httpResponse.statusCode).toBe(400)
     expect(httpResponse.body).toEqual(new MissingParamError('id').message)
   })
-  test('Should return 400 if no taskName was provided. POST', async () => {
+  test('Should return 400 if no taskTitle was provided. POST', async () => {
     const sut = makeSut()
     const httpRequest = {
       body: {
@@ -44,14 +44,14 @@ describe('Task', () => {
     }
     const httpResponse = await sut.post(httpRequest)
     expect(httpResponse.statusCode).toBe(400)
-    expect(httpResponse.body).toEqual(new MissingParamError('taskName').message)
+    expect(httpResponse.body).toEqual(new MissingParamError('taskTitle').message)
   })
   test('Should return 400 if no taskText was provided. POST', async () => {
     const sut = makeSut()
     const httpRequest = {
       body: {
         id: 'any_id',
-        taskName: 'any_name',
+        taskTitle: 'any_name',
         taskDay: 'monday'
       }
     }
@@ -65,7 +65,7 @@ describe('Task', () => {
       body: {
         id: 'any_id',
         taskText: 'any_text',
-        taskName: 'any_name'
+        taskTitle: 'any_name'
       }
     }
     const httpResponse = await sut.post(httpRequest)
@@ -77,7 +77,8 @@ describe('Task', () => {
     const httpRequest = {
       body: {
         id: 'any_id',
-        taskName: 'any_name',
+        taskTitle: 'any_name',
+        taskMonth: 'any_month',
         taskText: 'any_text',
         taskDay: 'invalid_day'
       }

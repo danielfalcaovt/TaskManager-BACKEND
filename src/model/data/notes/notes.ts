@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/return-await */
 
+import { InvalidParamError } from '../../errors/invalid-param-error'
 import { NotFound } from '../../errors/param-not-found'
 import { badRequest, ok } from '../../helper/http-helper'
 import type { httpRequest, httpResponse } from '../../protocols/http'
@@ -100,6 +101,38 @@ export class notes implements noteQueries {
       })
     }
     const deletedNote = await query('DELETE FROM notes WHERE note_id = $1 AND user_id = $2 RETURNING *', [note.noteId, note.userId])
+    if (deletedNote.rows.length > 0) {
+      return new Promise((resolve, reject) => {
+        resolve(ok(deletedNote.rows[0]))
+      })
+    } else {
+      return new Promise((resolve, reject) => {
+        reject(new ServerError())
+      })
+    }
+  }
+
+  async deleteAll (httpRequest: httpRequest): Promise<httpResponse> {
+    const requiredParameters = ['userId', 'sure']
+    for (const pos of requiredParameters) {
+      if (!httpRequest.body[pos]) {
+        return new Promise(resolve => {
+          resolve(badRequest(new MissingParamError(pos)))
+        })
+      }
+    }
+    const { ...note } = httpRequest.body
+
+    const checkIfExist = await query('SELECT * FROM notes WHERE user_id = $1', [note.userId])
+    if (checkIfExist.rows.length === 0) {
+      return new Promise(resolve => {
+        resolve(badRequest(new NotFound('note')))
+      })
+    }
+    if (!note.sure) {
+      return new Promise(resolve => { resolve(badRequest(new InvalidParamError('sure'))) })
+    }
+    const deletedNote = await query('DELETE FROM notes WHERE user_id = $1 RETURNING *', [note.noteId, note.userId])
     if (deletedNote.rows.length > 0) {
       return new Promise((resolve, reject) => {
         resolve(ok(deletedNote.rows[0]))
