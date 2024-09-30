@@ -5,7 +5,6 @@ import type { verifyRequest } from '../task-protocols'
 export async function getTasks (req: verifyRequest, res: Response): Promise<any> {
   try {
     const { id } = req.usuario.body
-    console.log(req.usuario)
     const httpRequest = {
       body: {
         id

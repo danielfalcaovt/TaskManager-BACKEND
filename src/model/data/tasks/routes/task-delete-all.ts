@@ -3,17 +3,17 @@ import type { Response } from 'express'
 import { Task } from '../task'
 import type { verifyRequest } from '../task-protocols'
 
-export async function deleteTask (req: verifyRequest, res: Response): Promise<any> {
+export async function deleteAllTasks (req: verifyRequest, res: Response): Promise<any> {
   try {
-    const { userId, taskId } = req.params
+    const { userId, sure } = req.params
     const httpRequest = {
       body: {
         userId,
-        taskId
+        sure
       }
     }
     const taskQuery = new Task()
-    const httpResponse = await taskQuery.delete(httpRequest)
+    const httpResponse = await taskQuery.deleteAll(httpRequest)
     return res.status(httpResponse.statusCode).json(httpResponse.body)
   } catch (error) {
     return res.status(500).json(error.message)

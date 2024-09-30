@@ -38,11 +38,12 @@
   },
   "scripts": {
     "test": "jest --passWithNoTests --silent --noStackTrace --runInBand --detectOpenHandles",
+    "test:verbose": "jest --passWithNoTests",
     "prepare": "husky",
     "dev": "node ./dist/src/controller/server.js"
   },
   "name": "backend",
-  "version": "1.0.0",
+  "version": "1.5.0",
   "main": "./dist/src/server.js",
   "type": "commonjs",
   "keywords": [],
