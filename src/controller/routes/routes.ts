@@ -19,7 +19,7 @@ routes.get('/notes', getNotes)
 routes.post('/notes', postNotes)
 routes.patch('/notes', patchNotes)
 routes.delete('/notes/:noteId/:userId', deleteNotes)
-routes.delete('/notes/:userId/:sure/all', deleteAllNotes)
+routes.delete('/notes/deleteAll', deleteAllNotes)
 
 routes.get('/tasks', getTasks)
 routes.post('/tasks', postTask)

@@ -113,7 +113,7 @@ export class notes implements noteQueries {
   }
 
   async deleteAll (httpRequest: httpRequest): Promise<httpResponse> {
-    const requiredParameters = ['userId', 'sure']
+    const requiredParameters = ['id']
     for (const pos of requiredParameters) {
       if (!httpRequest.body[pos]) {
         return new Promise(resolve => {
@@ -121,18 +121,17 @@ export class notes implements noteQueries {
         })
       }
     }
-    const { ...note } = httpRequest.body
-
-    const checkIfExist = await query('SELECT * FROM notes WHERE user_id = $1', [note.userId])
+    const { id } = httpRequest.body
+    const checkIfExist = await query('SELECT * FROM notes WHERE user_id = $1', [id])
     if (checkIfExist.rows.length === 0) {
       return new Promise(resolve => {
         resolve(badRequest(new NotFound('note')))
       })
     }
-    if (!note.sure) {
-      return new Promise(resolve => { resolve(badRequest(new InvalidParamError('sure'))) })
+    if (!id) {
+      return new Promise(resolve => { resolve(badRequest(new InvalidParamError('id'))) })
     }
-    const deletedNote = await query('DELETE FROM notes WHERE user_id = $1 RETURNING *', [note.noteId, note.userId])
+    const deletedNote = await query('DELETE FROM notes WHERE user_id = $1 RETURNING *', [id])
     if (deletedNote.rows.length > 0) {
       return new Promise((resolve, reject) => {
         resolve(ok(deletedNote.rows[0]))
